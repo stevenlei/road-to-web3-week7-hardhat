@@ -235,8 +235,9 @@ contract Marketplace {
         address seller = item.seller;
 
         // Calculate the transaction fee
-        uint256 transactionFeeToReceive = item.price *
-            (transactionFee / 1 gwei);
+        uint256 transactionFeeToReceive = (item.price * transactionFee) /
+            1 gwei;
+
         require(
             transactionFeeToReceive < item.price,
             "incorrect transaction fee"
@@ -258,10 +259,12 @@ contract Marketplace {
             payable(item.royaltyAddress).transfer(royaltyToPay);
         }
 
+        uint256 amountToSeller = item.price -
+            royaltyToPay -
+            transactionFeeToReceive;
+
         // Pay to the seller
-        payable(seller).transfer(
-            item.price - royaltyToPay - transactionFeeToReceive
-        );
+        payable(seller).transfer(amountToSeller);
 
         // Transfer token to the seller
         IERC721(_contractAddress).safeTransferFrom(
