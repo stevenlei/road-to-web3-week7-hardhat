@@ -77,14 +77,18 @@ contract Marketplace {
     // Get all items
     function getItems(bool isListed) external view returns (NFT[] memory) {
         NFT[] memory itemsArray = new NFT[](lastItemIndex);
-        for (uint256 i = 1; i < lastItemIndex; i++) {
+        uint256 index = 0;
+
+        for (uint256 i = 1; i <= lastItemIndex; i++) {
             if (isListed) {
                 if (items[i].isListed) {
-                    itemsArray[i] = items[i];
+                    itemsArray[index] = items[i];
                 }
             } else {
-                itemsArray[i] = items[i];
+                itemsArray[index] = items[i];
             }
+
+            index++;
         }
         return itemsArray;
     }
