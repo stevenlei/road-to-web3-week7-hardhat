@@ -12,6 +12,9 @@ async function main() {
   await marketplace.setCreator(creator.address);
   await creator.setMarketplace(marketplace.address);
 
+  await marketplace.setCreatorFee(ethers.utils.parseUnits("0.001", "ether"));
+  await marketplace.setTransactionFee(ethers.utils.parseUnits("0.05", "gwei")); // 5%
+
   console.log(`Marketplace address: ${marketplace.address}`);
   console.log(`Creator address: ${creator.address}`);
 }

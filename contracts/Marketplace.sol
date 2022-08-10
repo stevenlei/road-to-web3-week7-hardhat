@@ -77,9 +77,11 @@ contract Marketplace {
     // Get all items
     function getItems(bool isListed) external view returns (NFT[] memory) {
         NFT[] memory itemsArray = new NFT[](lastItemIndex);
-        for (uint256 i = 0; i < lastItemIndex; i++) {
-            if (isListed && items[i].isListed == isListed) {
-                itemsArray[i] = items[i];
+        for (uint256 i = 1; i < lastItemIndex; i++) {
+            if (isListed) {
+                if (items[i].isListed) {
+                    itemsArray[i] = items[i];
+                }
             } else {
                 itemsArray[i] = items[i];
             }
@@ -123,8 +125,16 @@ contract Marketplace {
         // price cannot be 0
         require(_price > 0, "price cannot be 0");
 
-        // Increment first
-        lastItemIndex++;
+        uint256 itemIndex;
+
+        // Item already listed in the past, reuse that index
+        if (indexOfItem[_contractAddress][_tokenId] > 0) {
+            itemIndex = indexOfItem[_contractAddress][_tokenId];
+        } else {
+            // Increment first
+            lastItemIndex++;
+            itemIndex = lastItemIndex;
+        }
 
         // Get the royalty setting
         uint256 _royalty = creatorRoyalties[_contractAddress][_tokenId];
@@ -133,7 +143,7 @@ contract Marketplace {
         address _creator = creatorAddress[_contractAddress][_tokenId];
 
         // List item
-        items[lastItemIndex] = NFT(
+        items[itemIndex] = NFT(
             _contractAddress,
             _tokenId,
             msg.sender,
@@ -144,7 +154,7 @@ contract Marketplace {
         );
 
         // Set the index of the item in the items mapping
-        indexOfItem[_contractAddress][_tokenId] = lastItemIndex;
+        indexOfItem[_contractAddress][_tokenId] = itemIndex;
     }
 
     // Unlist Item
